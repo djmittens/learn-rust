@@ -1,0 +1,10 @@
+[package]
+name = "learn-rust"
+version = "0.1.0"
+authors = ["Nick Gridinskiy <nikita.gridinskiy@gmail.com>"]
+
+[dependencies]
+getopts = "~0.2.14"
+num = "~0.1.36"
+permutohedron = "~0.2.2"
+primal = "~0.2.3"
