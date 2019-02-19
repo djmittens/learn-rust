@@ -9,6 +9,7 @@ extern crate serde_derive;
 mod day2;
 mod day3;
 mod guessing_game;
+mod vars;
 
 fn main() {
     if false {
