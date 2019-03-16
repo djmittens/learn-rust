@@ -9,6 +9,7 @@ extern crate serde_derive;
 mod day2;
 mod day3;
 mod guessing_game;
+mod functions;
 
 fn main() {
     if false {
@@ -21,7 +22,11 @@ fn main() {
     if false {
         day3::write_csv();
     }
-    if !false {
+    if false {
         guessing_game::play_game();
+    }
+
+    if !false {
+        functions::main();
     }
 }
