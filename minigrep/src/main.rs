@@ -2,23 +2,30 @@ use std::env;
 use std::process;
 use minigrep;
 use minigrep::Config;
+use std::collections::HashMap;
 
 fn main() {
     // let query = &args[1];
     // let filename = &args[2];
     let args: Vec<String> = env::args().collect();
-    let config = Config::new(&args).unwrap_or_else(|err| {
+    let envVars: HashMap<String, String> = env::vars().collect();
+
+    let config = Config::new(&args, &envVars).unwrap_or_else(|err| {
         println!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
 
-    let Config { query, filename } = &config;
+    let Config { query, filename, case_sensitive } = &config;
+    // let woo: &mut str = &mut query[0..2];
+    // let s: &str = "wooh";
 
     println!("Searching for {}", query);
     println!("In file {}", filename);
+    println!("ignoring case {}", case_sensitive);
+
 
     if let Err(e) = minigrep::run(config) {
-        println!("Application error {}", e);
+        eprintln!("Application error {}", e);
         process::exit(1);
     }
 }
