@@ -7,10 +7,10 @@ use std::collections::HashMap;
 fn main() {
     // let query = &args[1];
     // let filename = &args[2];
-    let args: Vec<String> = env::args().collect();
+    // let args: Vec<String> = env::args().collect();
     let envVars: HashMap<String, String> = env::vars().collect();
 
-    let config = Config::new(&args, &envVars).unwrap_or_else(|err| {
+    let config = Config::new(env::args(), &envVars).unwrap_or_else(|err| {
         println!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
