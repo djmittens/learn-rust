@@ -1,22 +1,12 @@
-[package]
+[workspace]
+
 name = "learn-rust"
 version = "0.1.0"
 authors = ["Nick Gridinskiy <nikita.gridinskiy@gmail.com>"]
 
-[dependencies]
-# getopts = "~0.2.14"
-# num = "~0.1.36"
-# permutohedron = "~0.2.2"
-primal = "~0.2.3"
-csv = "1.0.5"
-serde_derive = "1.0.80"
-serde = "1.0.80"
-rand = "0.6.1"
-
-[profile.dev]
-# opt level ranges from 0 to 3, and stands for the number of optimizations
-# that the compiler will apply.
-opt-level = 0
-
-[profile.release]
-opt-level = 3
+members = [
+    "adder",
+    "add-one",
+    "minigrep",
+    "old-shit",
+]
