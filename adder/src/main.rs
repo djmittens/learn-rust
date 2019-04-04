@@ -1,7 +1,7 @@
 use add_one;
-use std::rc::Weak;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
+use std::rc::Weak;
 
 fn main() {
     let num = 10;
@@ -40,15 +40,12 @@ fn main() {
     println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
 }
 
-
 #[derive(Debug)]
 struct Node {
     value: i32,
     parent: RefCell<Weak<Node>>,
     children: RefCell<Vec<Rc<Node>>>,
 }
-
-
 
 enum List {
     Cons(i32, Rc<List>),

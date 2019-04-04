@@ -1,13 +1,13 @@
 //! this is commenting the current crate
 //! or rather this comment goes into the object that is containing it
 //! rather than the object thats below it
-//! 
+//!
 
 ///
 /// Whoo weee, thats a nice `Shoe`
 /// # Shoes are the best or something
 /// ## And this is a subheading
-/// 
+///
 /// Who would have thought you can write markdown in the comments.
 /// I wonder if this works with images as well?
 #[derive(PartialEq, Debug)]

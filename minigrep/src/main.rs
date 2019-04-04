@@ -1,8 +1,8 @@
-use std::env;
-use std::process;
 use minigrep;
 use minigrep::Config;
 use std::collections::HashMap;
+use std::env;
+use std::process;
 
 fn main() {
     // let query = &args[1];
@@ -15,14 +15,17 @@ fn main() {
         process::exit(1);
     });
 
-    let Config { query, filename, case_sensitive } = &config;
+    let Config {
+        query,
+        filename,
+        case_sensitive,
+    } = &config;
     // let woo: &mut str = &mut query[0..2];
     // let s: &str = "wooh";
 
     println!("Searching for {}", query);
     println!("In file {}", filename);
     println!("ignoring case {}", case_sensitive);
-
 
     if let Err(e) = minigrep::run(config) {
         eprintln!("Application error {}", e);

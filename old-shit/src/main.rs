@@ -11,10 +11,10 @@ mod day3;
 mod guessing_game;
 mod vars;
 
-use std::thread;
-use std::time::Duration;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     if false {
@@ -115,31 +115,40 @@ fn generate_workout(intensity: u32, random_number: u32) {
         if random_number == 3 {
             println!("Take a break today! Remember to stay hydrated!");
         } else {
-            println!("Today, run for {} minutes!", expensive_closure.value(intensity));
+            println!(
+                "Today, run for {} minutes!",
+                expensive_closure.value(intensity)
+            );
         }
     }
 }
 
-struct Cacher <T, U, Z>
-    where T: Fn(U) -> Z, U: Eq + Hash
+struct Cacher<T, U, Z>
+where
+    T: Fn(U) -> Z,
+    U: Eq + Hash,
 {
     calculation: T,
     map: HashMap<U, Z>,
 }
 
-impl<T, U, Z> Cacher<T, U, Z> where T: Fn(U) -> Z, U: Eq + Hash + Clone {
+impl<T, U, Z> Cacher<T, U, Z>
+where
+    T: Fn(U) -> Z,
+    U: Eq + Hash + Clone,
+{
     fn new(calculation: T) -> Cacher<T, U, Z> {
         Cacher {
             calculation,
-            map: HashMap :: new(),
+            map: HashMap::new(),
         }
     }
 
-    fn value(&mut self, arg: U) -> & Z {
+    fn value(&mut self, arg: U) -> &Z {
         let calc = &self.calculation;
         let map = &mut self.map;
         let a = arg.clone();
-        map.entry(a).or_insert_with(||{calc(arg.clone())})
+        map.entry(a).or_insert_with(|| calc(arg.clone()))
     }
 }
 
