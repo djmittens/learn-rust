@@ -1,4 +1,6 @@
 use add_one;
+use hello_macro::HelloMacro;
+use hello_macro_derive::HelloMacro;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::rc::Weak;
@@ -13,10 +15,10 @@ fn main() {
 
     let a = List::cons((1, List::cons((2, List::cons(3)))));
     println!("RC count = {}", Rc::strong_count(&a));
-    let b = List::Cons(3, Rc::clone(&a));
+    let _b = List::Cons(3, Rc::clone(&a));
     println!("RC count = {}", Rc::strong_count(&a));
     {
-        let c = List::Cons(4, Rc::clone(&a));
+        let _c = List::Cons(4, Rc::clone(&a));
         println!("RC count = {}", Rc::strong_count(&a));
     }
     println!("RC count = {}", Rc::strong_count(&a));
@@ -38,6 +40,7 @@ fn main() {
     *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
 
     println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+    List::hello_macro();
 }
 
 #[derive(Debug)]
@@ -47,6 +50,7 @@ struct Node {
     children: RefCell<Vec<Rc<Node>>>,
 }
 
+#[derive(HelloMacro)]
 enum List {
     Cons(i32, Rc<List>),
     Nil,

@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 add-one = {path = "../add-one"}
+hello_macro_derive = {path = "../hello_macro_derive"}
+hello_macro = {path = "../hello_macro"}
