@@ -7,6 +7,7 @@ members = [
     "old-shit",
     "hello_macro",
     "hello_macro_derive",
+    "servio",
 ]
 
 [profile.dev]
