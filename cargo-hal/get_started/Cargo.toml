@@ -1,0 +1,18 @@
+[package]
+name = "get_started"
+version = "0.1.0"
+authors = ["Nikita Gridinskiy <nikita.gridinskiy@gmail.com>"]
+edition = "2018"
+
+[features]
+default = ["wgpu/vulkan"]
+local = ["wgpu-native/local"]
+metal = ["wgpu/metal"]
+dx11 = ["wgpu/dx11"]
+dx12 = ["wgpu/dx12"]
+vulkan = ["wgpu/vulkan"]
+
+[dependencies]
+wgpu-native = "*"
+wgpu = "*"
+env_logger = "*"

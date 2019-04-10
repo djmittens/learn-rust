@@ -1,0 +1,8 @@
+[package]
+name = "learn-vulkan"
+version = "0.1.0"
+authors = ["Nikita Gridinskiy <nikita.gridinskiy@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+vulkano = "*"
