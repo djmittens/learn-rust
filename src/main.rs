@@ -11,6 +11,8 @@ mod day3;
 mod guessing_game;
 mod vars;
 
+use std::env;
+
 fn main() {
     if false {
         println!("Hello, world!");
@@ -77,6 +79,7 @@ fn main() {
         None => println!("There is no god")
     }
 
+    let args: Vec<String> = env::args().collect();
 }
 
 mod sound {
