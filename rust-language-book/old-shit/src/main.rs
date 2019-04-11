@@ -1,6 +1,6 @@
 // Aparantly you only need to put this stuff in the main file (extern crates that is)
-extern crate primal;
 extern crate csv;
+extern crate primal;
 extern crate rand;
 // Why is this necessary
 #[macro_use]
@@ -11,7 +11,10 @@ mod day3;
 mod guessing_game;
 mod vars;
 
-use std::env;
+use std::collections::HashMap;
+use std::hash::Hash;
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     if false {
@@ -49,15 +52,23 @@ fn main() {
         ..user1
     };
 
-    let black = Color(0,0,0);
+    let black = Color(0, 0, 0);
     println!("oh noes, we derived something {:?}", user2);
 
-    let rect1 = Rectangle{width: 30, height: 50};
-    let rect2 = Rectangle{width: 10, height: 40};
-    let rect3 = Rectangle{width: 60, height: 45};
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    let rect2 = Rectangle {
+        width: 10,
+        height: 40,
+    };
+    let rect3 = Rectangle {
+        width: 60,
+        height: 45,
+    };
 
     println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect1));
-
 
     let four = IpAddrKind::V4(String::from("127.0.0.1"));
     let six = IpAddrKind::V6;
@@ -67,7 +78,7 @@ fn main() {
     crate::sound::instrument::clarinet();
 
     let v: Vec<i32> = Vec::new();
-    let mut v = vec![1,2,3];
+    let mut v = vec![1, 2, 3];
     v.push(5);
 
     let third = &v[2];
@@ -76,10 +87,69 @@ fn main() {
 
     match v.get(2) {
         Some(third) => println!("WHuuuuut"),
-        None => println!("There is no god")
+        None => println!("There is no god"),
     }
 
-    let args: Vec<String> = env::args().collect();
+    let uspv = 10;
+    let srn = 7;
+
+    generate_workout(uspv, srn);
+}
+
+fn simulated_expensive_calculation(intensity: u32) -> u32 {
+    println!("calculating slowly ...");
+    thread::sleep(Duration::from_secs(2));
+    intensity
+}
+
+fn generate_workout(intensity: u32, random_number: u32) {
+    let mut expensive_closure = Cacher::new(|num| {
+        println!("calculating slowly ...");
+        thread::sleep(Duration::from_secs(2));
+        intensity
+    });
+    if intensity < 25 {
+        println!("Today, do {} pushups!", expensive_closure.value(intensity));
+        println!("Next, do {} situps !", expensive_closure.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!(
+                "Today, run for {} minutes!",
+                expensive_closure.value(intensity)
+            );
+        }
+    }
+}
+
+struct Cacher<T, U, Z>
+where
+    T: Fn(U) -> Z,
+    U: Eq + Hash,
+{
+    calculation: T,
+    map: HashMap<U, Z>,
+}
+
+impl<T, U, Z> Cacher<T, U, Z>
+where
+    T: Fn(U) -> Z,
+    U: Eq + Hash + Clone,
+{
+    fn new(calculation: T) -> Cacher<T, U, Z> {
+        Cacher {
+            calculation,
+            map: HashMap::new(),
+        }
+    }
+
+    fn value(&mut self, arg: U) -> &Z {
+        let calc = &self.calculation;
+        let map = &mut self.map;
+        let a = arg.clone();
+        map.entry(a).or_insert_with(|| calc(arg.clone()))
+    }
 }
 
 mod sound {
@@ -92,9 +162,9 @@ mod sound {
 
 enum Message {
     Quit,
-    Move {x: i32, y: i32},
+    Move { x: i32, y: i32 },
     Write(String),
-    ChangeColor{r: i32, g: i32, b: i32},
+    ChangeColor { r: i32, g: i32, b: i32 },
 }
 
 fn route(ip_type: IpAddrKind) {}
@@ -110,12 +180,12 @@ pub fn build_user(email: String, username: String) -> User {
 
 enum IpAddrKind {
     V4(String),
-    V6(String)
+    V6(String),
 }
 
 struct IpAddr {
     kind: IpAddrKind,
-    address: String
+    address: String,
 }
 
 struct Color(i32, i32, i32);
@@ -137,7 +207,10 @@ impl Rectangle {
     }
 
     fn square(size: u32) -> Rectangle {
-        Rectangle { width: size, height: size }
+        Rectangle {
+            width: size,
+            height: size,
+        }
     }
 }
 

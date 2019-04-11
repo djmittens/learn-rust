@@ -1,0 +1,19 @@
+[workspace]
+
+members = [
+    "adder",
+    "add-one",
+    "minigrep",
+    "old-shit",
+    "hello_macro",
+    "hello_macro_derive",
+    "servio",
+]
+
+[profile.dev]
+# opt level ranges from 0 to 3, and stands for the number of optimizations
+# that the compiler will apply.
+opt-level = 0
+
+[profile.release]
+opt-level = 3

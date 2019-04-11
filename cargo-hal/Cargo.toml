@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "get_started",
+    "learn-vulkan",
+]

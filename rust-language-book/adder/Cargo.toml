@@ -1,0 +1,10 @@
+[package]
+name = "adder"
+version = "0.1.0"
+authors = ["Nikita Gridinskiy <nikita.gridinskiy@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+add-one = {path = "../add-one"}
+hello_macro_derive = {path = "../hello_macro_derive"}
+hello_macro = {path = "../hello_macro"}
