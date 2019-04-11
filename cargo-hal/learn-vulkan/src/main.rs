@@ -68,4 +68,8 @@ fn main() {
     let dest_content = dest.read().unwrap();
 
     assert_eq!(&*source_content, &*dest_content);
+
+    let data_iter = 0..65536;
+    let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), data_iter)
+        .expect("Failed to create buffer");
 }
