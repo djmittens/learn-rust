@@ -42,9 +42,11 @@ impl SimpleState for Pong {
     fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
         let world = _data.world;
         let sprite_handle = load_sprite_sheet(world);
-        world.register::<Paddle>();
+        // world.register::<Paddle>();
+        world.register::<Ball>();
         initialise_camera(world);
-        initialise_paddles(world, sprite_handle);
+        initialise_paddles(world, sprite_handle.clone());
+        initialize_ball(world, sprite_handle);
     }
 }
 
@@ -125,4 +127,42 @@ fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle {
     };
 
     sprite_sheet
+}
+
+/// BAllz to the wallz. or something like that.
+
+pub const BALL_VELOCITY_X: f32 = 75.0;
+pub const BALL_VELOCITY_Y: f32 = 50.0;
+pub const BALL_RADIUS: f32 = 2.0;
+
+pub struct Ball {
+    pub velocity: [f32; 2],
+    pub radius: f32,
+}
+
+impl Component for Ball {
+    type Storage = DenseVecStorage<Self>;
+}
+
+/// A single ball, somewhere in the middle of the screen
+fn initialize_ball(world: &mut World, sprite_sheet_handle: SpriteSheetHandle) {
+    // Translations
+    let mut local_transform = Transform::default();
+    local_transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
+
+    // Assign the sprite for the ball
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet_handle,
+        sprite_number: 1, // muu and it shall
+    };
+
+    world
+        .create_entity()
+        .with(sprite_render)
+        .with(Ball {
+            radius: BALL_RADIUS,
+            velocity: [BALL_VELOCITY_X, BALL_VELOCITY_Y],
+        })
+        .with(local_transform)
+        .build();
 }

@@ -9,11 +9,8 @@ use amethyst::{
     prelude::*,
     renderer::{DisplayConfig, DrawFlat2D, Pipeline, PosNormTex, RenderBundle, Stage},
     utils::application_root_dir,
-    LoggerConfig,
-    StdoutLog,
-    LogLevelFilter,
+    LogLevelFilter, LoggerConfig, StdoutLog,
 };
-
 
 use crate::pong::Pong;
 
@@ -47,7 +44,13 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
         .with_bundle(input_bundle)?
         .with_bundle(TransformBundle::new())?
-        .with(systems::PaddleSystem, "paddle_system", &["input_system"]);
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
+        .with(systems::MoveBallsSystem, "balls_system", &["paddle_system"])
+        .with(
+            systems::BounceSystem,
+            "bounce_system",
+            &["balls_system", "paddle_system"],
+        );
 
     let mut game = Application::new("./", Pong {}, game_data)?;
     game.run();
