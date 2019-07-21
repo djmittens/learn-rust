@@ -1,59 +1,106 @@
-extern crate amethyst;
-
-mod pong;
-mod systems;
-
-use amethyst::{
-    core::transform::bundle::TransformBundle,
-    input::InputBundle,
+use amethyst :: {
+    assets::Processor,
+    ecs::{ReadExpect, Resources, SystemData},
     prelude::*,
-    renderer::{DisplayConfig, DrawFlat2D, Pipeline, PosNormTex, RenderBundle, Stage},
+    renderer::{
+        pass::DrawFlat2DDesc, types::DefaultBackend, Factory, Format, GraphBuilder, GraphCreator,
+        Kind, RenderGroupDesc, RenderingSystem, SpriteSheet, SubpassBuilder,
+    },
     utils::application_root_dir,
-    LogLevelFilter, LoggerConfig, StdoutLog,
+    window::{ScreenDimensions, Window, WindowBundle},
 };
 
-use crate::pong::Pong;
+pub struct Pong;
+impl SimpleState for Pong {}
 
+/// Starts our app
+/// This function is actually pretty cool because we get to set everything up.
 fn main() -> amethyst::Result<()> {
-    // have to silence some logs, because amethyst keeps creating gl buffers and spams the std out.
-    // https://github.com/amethyst/amethyst/issues/1217
-    // amethyst::start_logger(Default::default());
-    amethyst::start_logger(LoggerConfig {
-        stdout: StdoutLog::Colored,
-        level_filter: LogLevelFilter::Warn,
-        log_file: None,
-        allow_env_override: true,
-    });
+    amethyst::start_logger(Default::default());
+    let app_root = application_root_dir()?;
+    // i find it funny that rather than spell the whole thing out in 1 string with a `/` we have to type out .join
+    let display_config_path = app_root.join("resources").join("display_config.ron");
 
-    let path = format!("{}/resources/display_config.ron", application_root_dir());
-    let config = DisplayConfig::load(&path);
+    // we gunna open a window based on configuration we layed out.
+    let mut game_data = GameDataBuilder::default()
+    .with_bundle(WindowBundle::from_config_path(display_config_path))?
+    .with(
+        Processor::<SpriteSheet>::new(), 
+        "sprite_sheet_processor", 
+        &[])
+    .with_thread_local(RenderingSystem::<DefaultBackend, _>::new(
+        ExampleGraph::default()
+        ));
 
-    // Some random rendering code, but aparantly its too early to understand it yet.
-    let pipe = Pipeline::build().with_stage(
-        Stage::with_backbuffer()
-            .clear_target([0.0, 0.0, 0.0, 1.0], 1.0)
-            .with_pass(DrawFlat2D::new()),
-    );
-
-    let binding_path = format!("{}/resources/bindings_config.ron", application_root_dir());
-
-    let input_bundle =
-        InputBundle::<String, String>::new().with_bindings_from_file(binding_path)?;
-
-    let game_data = GameDataBuilder::default()
-        .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
-        .with_bundle(input_bundle)?
-        .with_bundle(TransformBundle::new())?
-        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
-        .with(systems::MoveBallsSystem, "balls_system", &["paddle_system"])
-        .with(
-            systems::BounceSystem,
-            "bounce_system",
-            &["balls_system", "paddle_system"],
-        );
-
-    let mut game = Application::new("./", Pong {}, game_data)?;
+    let asset_dir = app_root.join("assets");
+    let mut game = Application::new(asset_dir, Pong, game_data)?;
     game.run();
 
-    Ok(())
+    Ok (())
+}
+
+#[derive(Default)]
+struct ExampleGraph {
+    dimensions: Option<ScreenDimensions>,
+    dirty: bool,
+}
+
+impl GraphCreator<DefaultBackend> for ExampleGraph {
+    fn rebuild(&mut self, res: &Resources) -> bool {
+        let new_dimensions = res.try_fetch::<ScreenDimensions>();
+        use std::ops::Deref;
+        if self.dimensions.as_ref() != new_dimensions.as_ref().map(|d| d.deref()) {
+            self.dirty = true;
+            self.dimensions = new_dimensions.map(|d| d.clone());
+            return false;
+        }
+        return self.dirty;
+    }
+
+    fn builder(
+        &mut self,
+        factory: &mut Factory<DefaultBackend>,
+        res: &Resources,
+    ) -> GraphBuilder<DefaultBackend, Resources> {
+        use amethyst::renderer::rendy::{
+            graph::present::PresentNode,
+            hal::command::{ClearDepthStencil, ClearValue},
+        };
+
+        self.dirty = false;
+
+        let window = <ReadExpect<'_, Window>>::fetch(res);
+        let dimensions = self.dimensions.as_ref().unwrap();
+        let window_kind = Kind::D2(dimensions.width() as u32, dimensions.height() as u32, 1, 1);
+        let surface = factory.create_surface(&window);
+        let surface_format = factory.get_surface_format(&surface);
+
+        let mut graph_builder = GraphBuilder::new();
+        let color = graph_builder.create_image(
+            window_kind,
+            1,
+            surface_format,
+            Some(ClearValue::Color([0.0, 0.0,0.0,1.0].into())),
+        );
+
+        let depth = graph_builder.create_image(
+            window_kind,
+            1,
+            Format::D32Sfloat,
+            Some(ClearValue::DepthStencil(ClearDepthStencil(1.0, 0))),
+        );
+
+        let pass = graph_builder.add_node(
+            SubpassBuilder::new()
+            .with_group(DrawFlat2DDesc::new().builder())
+            .with_color(color)
+            .with_depth_stencil(depth)
+            .into_pass()
+        );
+
+        let _present = graph_builder.add_node(PresentNode::builder(factory, surface, color)
+        .with_dependency(pass));
+
+        graph_builder
+    }
 }

@@ -5,4 +5,7 @@ authors = []
 edition = "2018"
 
 [dependencies]
-amethyst = "0.10.0"
+
+[dependencies.amethyst]
+version = "0.11.1"
+features = ["vulkan"]
